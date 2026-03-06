@@ -47,10 +47,28 @@ async function startServer() {
       }
     });
 
+    // DELETE USER
+    app.delete("/users/:id", async (req, res) => {
+      try {
+        const { ObjectId } = require("mongodb");
+
+        const result = await collection.deleteOne({
+          _id: new ObjectId(req.params.id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ message: "User deleted" });
+      } catch (error) {
+        res.status(500).json({ message: "Failed to delete user" });
+      }
+    });
+
     app.listen(port, () => {
       console.log(`Server running at http://localhost:${port}`);
     });
-
   } catch (error) {
     console.error("MongoDB connection failed", error);
   }
