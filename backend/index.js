@@ -45,6 +45,26 @@ async function startServer() {
       }
     });
 
+    // UPDATE USER
+    app.put("/users/:id", async (req, res) => {
+      try {
+        const { ObjectId } = require("mongodb");
+
+        const result = await collection.updateOne(
+          { _id: new ObjectId(req.params.id) },
+          { $set: req.body },
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ message: "User updated" });
+      } catch (error) {
+        res.status(500).json({ message: "Failed to update user" });
+      }
+    });
+
     // DELETE USER
     app.delete("/users/:id", async (req, res) => {
       try {

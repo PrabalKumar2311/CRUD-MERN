@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
-import { Trash } from "lucide-react";
+import { Trash, Pencil } from "lucide-react";
 import AddUser from "./AddUser";
+import EditUser from "./EditUser";
 
 function App() {
   const [users, setUsers] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editUser, setEditUser] = useState(null);
   const [search, setSearch] = useState("");
 
   // FETCH USERS
@@ -46,7 +48,8 @@ function App() {
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase()) ||
-      user.department.toLowerCase().includes(search.toLowerCase()),
+      user.department.toLowerCase().includes(search.toLowerCase()) ||
+      user.age.toString().includes(search),
   );
 
   return (
@@ -63,10 +66,10 @@ function App() {
         </button>
       </div>
 
-      <div className="max-w-lg mx-auto mb-6">
+      <div className="max-w-md mx-auto mb-6">
         <input
           type="text"
-          placeholder="Search name, email, department..."
+          placeholder="Search name, email, department, age..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full border-amber-50 rounded-lg p-3 bg-gray-400"
@@ -75,7 +78,7 @@ function App() {
 
       {/* USER LIST */}
       <div className="max-w-7xl mx-auto grid gap-4 grid-cols-[repeat(auto-fill,minmax(260px,1fr))] justify-start">
-        {filteredUsers.length === 0 ? (
+        {filteredUsers.length === 0 && users.length != 0 ? (
           <p className="col-span-full text-center text-gray-800 text-lg">
             No results for "{search}"
           </p>
@@ -88,9 +91,17 @@ function App() {
               {/* DELETE BUTTON */}
               <button
                 onClick={() => deleteUser(user._id)}
-                className="absolute top-3 right-3 text-red-500 hover:text-red-600"
+                className="absolute top-3 right-3 text-red-500 hover:text-red-700"
               >
                 <Trash size={18} />
+              </button>
+
+              {/* EDIT BUTTON */}
+              <button
+                onClick={() => setEditUser(user)}
+                className="absolute top-3.5 right-10 text-blue-600 hover:text-blue-800"
+              >
+                <Pencil size={16} />
               </button>
 
               <h2 className="text-lg sm:text-xl font-semibold break-words">
@@ -129,6 +140,14 @@ function App() {
       {showForm && (
         <AddUser
           closeForm={() => setShowForm(false)}
+          refreshUsers={fetchUsers}
+        />
+      )}
+
+      {editUser && (
+        <EditUser
+          user={editUser}
+          closeForm={() => setEditUser(null)}
           refreshUsers={fetchUsers}
         />
       )}
