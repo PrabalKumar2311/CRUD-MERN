@@ -84,7 +84,7 @@ function AddUser({ closeForm, refreshUsers }) {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-[420px] rounded-2xl shadow-2xl p-8 space-y-4"
+        className="bg-white w-105 rounded-2xl shadow-2xl p-8 space-y-4"
       >
 
         <h2 className="text-2xl font-semibold text-gray-800">

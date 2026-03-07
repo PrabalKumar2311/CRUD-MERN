@@ -11,14 +11,12 @@ app.use(express.json());
 const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
-const dbName = "detabase";
-
 async function startServer() {
   try {
     await client.connect();
     console.log("Connected to MongoDB");
 
-    const db = client.db(dbName);
+    const db = client.db("detabase");
     const collection = db.collection("students");
 
     // GET USERS
