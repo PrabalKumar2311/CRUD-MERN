@@ -30,7 +30,7 @@ function EditUser({ user, closeForm, refreshUsers }) {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:3000/users/${user._id}`,
+        `http://localhost:3000/user/update/${user._id}`,
         {
           method: "PUT",
           headers: {

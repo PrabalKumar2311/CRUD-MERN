@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
-import { Trash, Pencil } from "lucide-react";
+import { Trash, Pencil, Heart } from "lucide-react";
 import AddUser from "./AddUser";
 import EditUser from "./EditUser";
 
@@ -28,7 +28,7 @@ function App() {
   // DELETE USER
   const deleteUser = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/users/${id}`, {
+      const response = await fetch(`http://localhost:3000/user/delete/${id}`, {
         method: "DELETE",
       });
 
@@ -51,6 +51,58 @@ function App() {
       user.department.toLowerCase().includes(search.toLowerCase()) ||
       user.age.toString().includes(search),
   );
+
+  // 🔥 store throttle per user
+const throttleMap = {};
+
+
+const throttledLikeUser = (id) => {
+  if (!throttleMap[id]) {
+    let lastCall = 0;
+
+    throttleMap[id] = async (userId) => {
+      const now = Date.now();
+
+      if (now - lastCall < 2000) return;
+      lastCall = now;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/user/like/${userId}`,
+          { method: "PUT" }
+        );
+
+        if (!response.ok) return;
+
+        // ✅ update UI ONLY after success
+        setUsers((prev) =>
+          prev.map((u) =>
+            u._id === userId
+              ? { ...u, likes: (u.likes || 0) + 1 }
+              : u
+          )
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }
+
+  throttleMap[id](id);
+};
+
+function throttle(func, delay) {
+  let lastCall = 0;
+
+  return function (...args) {
+    const now = Date.now();
+
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      func(...args);
+    }
+  };
+}
 
   return (
     <div className="min-h-screen bg-gray-500 px-4 sm:px-6 lg:px-10 py-10">
@@ -88,6 +140,12 @@ function App() {
               key={user._id}
               className="bg-gray-400 shadow-md hover:shadow-xl transition rounded-xl p-5 relative flex flex-col gap-2"
             >
+              <button
+                onClick={() => throttledLikeUser(user._id)}
+                className="absolute bottom-3 right-3 flex items-center gap-1 text-pink-600 hover:text-pink-700 transition"
+              >
+                <Heart size={18}/> <span className="text-sm">{user.likes || 0}</span>
+              </button>
               {/* DELETE BUTTON */}
               <button
                 onClick={() => deleteUser(user._id)}
@@ -104,14 +162,14 @@ function App() {
                 <Pencil size={16} />
               </button>
 
-              <h2 className="text-lg sm:text-xl font-semibold break-words">
+              <h2 className="text-lg sm:text-xl font-semibold wrap-break-word">
                 {user.name}
               </h2>
 
-              <p className="text-sm break-words">{user.email}</p>
+              <p className="text-sm wrap-break-word">{user.email}</p>
               <p className="text-sm">Age: {user.age}</p>
               <p className="text-sm">CGPA: {user.cgpa}</p>
-              <p className="text-sm break-words">{user.department}</p>
+              <p className="text-sm wrap-break-word">{user.department}</p>
 
               {/* SKILLS */}
               <div className="flex flex-wrap gap-2 mt-2">

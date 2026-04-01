@@ -19,6 +19,7 @@ function AddUser({ closeForm, refreshUsers }) {
       department: form.get("department"),
       enrolled: true,
       skills: form.get("skills"),
+      likes: 0,
       address: {
         city: form.get("city"),
         state: form.get("state"),
